@@ -2,7 +2,7 @@
 const Product = require('./product.model');
 
 const findProductById = async (id) => {
-  return await Product.findOne({ id });
+  return await Product.findOne({ _id: id });
 };
 const findProductByName = async (name) => {
   return await Product.findOne({ name });
