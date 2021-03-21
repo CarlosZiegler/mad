@@ -7,6 +7,8 @@ const {
   getAllCarts,
 } = require('../../data/cart/cart.repository');
 
+const { calculateCart } = require('./helpers');
+
 const Cart = require('../../data/cart/cart.entity');
 
 class CartController {
@@ -82,17 +84,6 @@ class CartController {
       console.log(error);
     }
   }
-}
-
-async function calculateCart(cart) {
-  if (cart.products.length > 0) {
-    const prices = await getPricesFromListOfProducts(cart.products);
-    const subtotal = prices.reduce((acc, item) => acc + item, 0);
-    const vat = subtotal * 0.19;
-    const total = subtotal + vat;
-    return { ...cart, subtotal, vat, total };
-  }
-  return { ...cart, subtotal: 0, vat: 0, total: 0 };
 }
 
 module.exports = CartController;

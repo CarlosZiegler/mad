@@ -5,7 +5,8 @@ class Cart extends ClassBase {
     super(data);
     this.products = data.products;
     this.couponsId = data.couponsId;
-    this.subtotal = data.subtotal;
+    this.subTotal = data.subTotal;
+    this.discount = data.discount;
     this.vat = data.vat;
     this.total = data.total;
   }

@@ -16,10 +16,10 @@ const CartSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: 'coupon',
-        sparse: true,
       },
     ],
-    subtotal: Number,
+    discount: Number,
+    subTotal: Number,
     vat: Number,
     total: Number,
   },
