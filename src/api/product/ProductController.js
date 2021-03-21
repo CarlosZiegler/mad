@@ -3,9 +3,9 @@ const {
   findProductById,
   findProductByName,
   getAllProducts,
-} = require('../../../data/product/product.repository');
+} = require('../../data/product/product.repository');
 
-module.exports = {
+class ProductController {
   async index(req, res, next) {
     try {
       const { id } = req.params;
@@ -19,7 +19,7 @@ module.exports = {
     } catch (error) {
       res.json(error);
     }
-  },
+  }
   async store(req, res, next) {
     try {
       const { name, price, description, inStock } = req.body;
@@ -41,7 +41,7 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-  },
+  }
   async show(req, res, next) {
     try {
       const products = await getAllProducts();
@@ -49,5 +49,6 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-  },
-};
+  }
+}
+module.exports = ProductController;

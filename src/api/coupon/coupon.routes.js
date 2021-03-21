@@ -1,6 +1,7 @@
 const express = require('express');
-const Controller = require('./controller/coupon');
+const CouponController = require('./CouponController');
 
+const Controller = new CouponController();
 const routes = express.Router();
 
 routes.get('/coupon/:code', Controller.index);

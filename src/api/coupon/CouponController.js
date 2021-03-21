@@ -1,9 +1,9 @@
 const {
   findCouponByCode,
   createCoupon,
-} = require('../../../data/coupon/coupon.repository');
+} = require('../../data/coupon/coupon.repository');
 
-module.exports = {
+class CouponController {
   async index(req, res, next) {
     try {
       const { code } = req.params;
@@ -17,7 +17,8 @@ module.exports = {
     } catch (error) {
       res.json(error);
     }
-  },
+  }
+
   async store(req, res, next) {
     try {
       const { code, value, availableUntil } = req.body;
@@ -39,5 +40,7 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-  },
-};
+  }
+}
+
+module.exports = CouponController;

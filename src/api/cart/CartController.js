@@ -2,10 +2,19 @@ const {
   createCart,
   findCartById,
   updateCart,
+  deleteCart,
   getPricesFromListOfProducts,
-} = require('../../../data/cart/cart.repository');
+} = require('../../data/cart/cart.repository');
 
-module.exports = {
+class CartController {
+  async show(req, res, next) {
+    try {
+      const carts = await getAllCarts();
+      res.json({ carts });
+    } catch (error) {
+      res.json(error);
+    }
+  }
   async index(req, res, next) {
     try {
       const { id } = req.params;
@@ -19,18 +28,20 @@ module.exports = {
     } catch (error) {
       res.json(error);
     }
-  },
+  }
+
   async store(req, res, next) {
     try {
       let cart = req.body;
-      // calculate price, vat , subtotal, total, ...
-      if (cart.couponsId) {
-        const prices = await getPricesFromListOfProducts(cart.couponsId);
+
+      if (cart.products.length > 0) {
+        const prices = await getPricesFromListOfProducts(cart.products);
         const subtotal = prices.reduce((acc, item) => acc + item, 0);
         const vat = subtotal * 0.19;
         const total = subtotal + vat;
         cart = { ...cart, subtotal, vat, total };
       }
+      // console.log(cart.total);
       const result = await createCart(cart);
       if (!result) {
         return res.status(500).json({
@@ -41,7 +52,8 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-  },
+  }
+
   async update(req, res, next) {
     try {
       const { id } = req.params;
@@ -54,5 +66,18 @@ module.exports = {
     } catch (error) {
       console.log(error);
     }
-  },
-};
+  }
+  async destroy(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const result = await deleteCart(id);
+
+      return res.status(201).json({ message: 'Cart Deleted', result });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+module.exports = CartController;

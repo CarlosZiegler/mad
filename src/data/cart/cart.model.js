@@ -3,18 +3,20 @@ const Schema = mongoose.Schema;
 
 const CartSchema = new Schema(
   {
-    productsId: [
+    products: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'product',
-        unique: true,
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: 'product',
+        },
+        qtd: Number,
       },
     ],
     couponsId: [
       {
         type: Schema.Types.ObjectId,
         ref: 'coupon',
-        unique: true,
+        sparse: true,
       },
     ],
     subtotal: Number,
