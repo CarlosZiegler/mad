@@ -4,7 +4,9 @@ const Cors = require('cors');
 
 const dbConnection = require('./configs/db.config');
 const app = express();
-const userRoutes = require('./api/user/user.routes');
+const couponRoutes = require('./api/coupon/coupon.routes');
+const productRoutes = require('./api/product/product.routes');
+const cartRoutes = require('./api/cart/cart.routes');
 
 const connectToMongo = async () => await dbConnection();
 connectToMongo();
@@ -12,7 +14,9 @@ connectToMongo();
 app.use(Cors());
 app.use(express.json());
 app.use(express.urlencoded());
-app.use(userRoutes);
+app.use(couponRoutes);
+app.use(productRoutes);
+app.use(cartRoutes);
 
 //Handle errors
 app.use(function (err, req, res, next) {
