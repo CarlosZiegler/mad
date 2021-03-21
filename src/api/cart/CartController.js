@@ -4,13 +4,17 @@ const {
   updateCart,
   deleteCart,
   getPricesFromListOfProducts,
+  getAllCarts,
 } = require('../../data/cart/cart.repository');
+
+const Cart = require('../../data/cart/cart.entity');
 
 class CartController {
   async show(req, res, next) {
     try {
-      const carts = await getAllCarts();
-      res.json({ carts });
+      const result = await getAllCarts();
+      const carts = result.map((item) => new Cart(item));
+      res.json(carts);
     } catch (error) {
       res.json(error);
     }
@@ -18,13 +22,14 @@ class CartController {
   async index(req, res, next) {
     try {
       const { id } = req.params;
-      const cart = await findCartById(id);
-      if (!cart) {
+      const found = await findCartById(id);
+      if (!found) {
         return res.status(404).json({
           message: 'Not found cart',
         });
       }
-      res.json({ cart });
+      const cart = new Cart(found);
+      res.json(cart);
     } catch (error) {
       res.json(error);
     }
@@ -32,23 +37,20 @@ class CartController {
 
   async store(req, res, next) {
     try {
-      let cart = req.body;
+      let data = req.body;
+      let cart = new Cart(data).withoutId();
 
-      if (cart.products.length > 0) {
-        const prices = await getPricesFromListOfProducts(cart.products);
-        const subtotal = prices.reduce((acc, item) => acc + item, 0);
-        const vat = subtotal * 0.19;
-        const total = subtotal + vat;
-        cart = { ...cart, subtotal, vat, total };
-      }
-      // console.log(cart.total);
-      const result = await createCart(cart);
+      const cartWithCalculations = await calculateCart(cart);
+
+      const result = await createCart(cartWithCalculations);
       if (!result) {
         return res.status(500).json({
           message: 'Error while create cart',
         });
       }
-      return res.status(200).json(result);
+      const createdCart = new Cart(result);
+
+      return res.status(200).json(createdCart);
     } catch (error) {
       console.log(error);
     }
@@ -58,7 +60,9 @@ class CartController {
     try {
       const { id } = req.params;
       const data = req.body;
-      const result = await updateCart(id, data);
+      const cart = new Cart(data);
+      const cartWithCalculations = await calculateCart(cart);
+      const result = await updateCart(id, cartWithCalculations);
       if (result.nModified !== 1) {
         throw error;
       }
@@ -78,6 +82,17 @@ class CartController {
       console.log(error);
     }
   }
+}
+
+async function calculateCart(cart) {
+  if (cart.products.length > 0) {
+    const prices = await getPricesFromListOfProducts(cart.products);
+    const subtotal = prices.reduce((acc, item) => acc + item, 0);
+    const vat = subtotal * 0.19;
+    const total = subtotal + vat;
+    return { ...cart, subtotal, vat, total };
+  }
+  return { ...cart, subtotal: 0, vat: 0, total: 0 };
 }
 
 module.exports = CartController;

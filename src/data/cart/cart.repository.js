@@ -22,7 +22,6 @@ const getPricesFromListOfProducts = async (products) => {
   try {
     return await Promise.all(
       products.map(async (product) => {
-        console.log(product);
         const found = await findProductById(product.productId);
         return found.price * product.qtd;
       })

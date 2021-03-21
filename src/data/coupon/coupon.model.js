@@ -7,6 +7,7 @@ const CouponSchema = new Schema(
       type: String,
       required: true,
       unique: true,
+      sparse: true,
     },
     value: {
       type: Number,
