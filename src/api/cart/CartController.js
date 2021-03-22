@@ -3,11 +3,8 @@ const {
   findCartById,
   updateCart,
   deleteCart,
-  getPricesFromListOfProducts,
   getAllCarts,
 } = require('../../data/cart/cart.repository');
-
-const { calculateCart } = require('./helpers');
 
 const Cart = require('../../data/cart/cart.entity');
 
@@ -40,11 +37,9 @@ class CartController {
   async store(req, res, next) {
     try {
       let data = req.body;
-      let cart = new Cart(data).withoutId();
+      const cart = await Cart.buildCartWithCalculations(data);
 
-      const cartWithCalculations = await calculateCart(cart);
-
-      const result = await createCart(cartWithCalculations);
+      const result = await createCart(cart.withoutId());
       if (!result) {
         return res.status(500).json({
           message: 'Error while create cart',
@@ -62,15 +57,20 @@ class CartController {
     try {
       const { id } = req.params;
       const data = req.body;
-      const cart = new Cart(data);
-      const cartWithCalculations = await calculateCart(cart);
-      const result = await updateCart(id, cartWithCalculations);
+      const cart = await Cart.buildCartWithCalculations(data);
+
+      const result = await updateCart(id, cart);
       if (result.nModified !== 1) {
-        throw error;
+        return res.status(500).json({
+          message: 'Error while update cart',
+        });
       }
       return res.status(200).json({ message: 'Cart updated' });
     } catch (error) {
       console.log(error);
+      return res.status(500).json({
+        message: 'Error while update cart, cart not found',
+      });
     }
   }
   async destroy(req, res, next) {
